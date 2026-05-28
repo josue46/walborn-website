@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('animate-fade-in');
+                entry.target.classList.add('active');
                 observer.unobserve(entry.target);
             }
         });
@@ -21,17 +21,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const revealElements = document.querySelectorAll('.reveal');
     revealElements.forEach(el => observer.observe(el));
 
-    // Navbar scroll effect
+    // Navbar scroll effect with requestAnimationFrame for performance
     const nav = document.getElementById('main-nav');
+    let scrollScheduled = false;
+
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            nav.classList.add('glass', 'py-3');
-            nav.classList.remove('py-4');
-        } else {
-            nav.classList.remove('glass', 'py-3');
-            nav.classList.add('py-4');
+        if (!scrollScheduled) {
+            requestAnimationFrame(() => {
+                if (window.scrollY > 50) {
+                    nav.classList.add('glass', 'py-3');
+                    nav.classList.remove('py-4');
+                } else {
+                    nav.classList.remove('glass', 'py-3');
+                    nav.classList.add('py-4');
+                }
+                scrollScheduled = false;
+            });
+            scrollScheduled = true;
         }
-    });
+    }, { passive: true });
 
     // Mobile menu toggle
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
